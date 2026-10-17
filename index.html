@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mezuniyetime Ne Kaldı? – İnşaat Müh. SCÜ</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d1f23;--mu:#6b6f76;--bd:#e2e0d8;--ac:#c2410c;--ok:#15803d;--bad:#b91c1c;--bar:#e8e6df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--card:#1f2126;--tx:#ececec;--mu:#9a9ea6;--bd:#33363d;--ac:#fb923c;--ok:#4ade80;--bad:#f87171;--bar:#2e3138}}
+:root[data-theme="dark"]{--bg:#15161a;--card:#1f2126;--tx:#ececec;--mu:#9a9ea6;--bd:#33363d;--ac:#fb923c;--ok:#4ade80;--bad:#f87171;--bar:#2e3138}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 2px}
+.sub{color:var(--mu);font-size:13px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.st{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.st b{display:block;font-size:24px}.st span{color:var(--mu);font-size:12px}
+.bar{height:10px;background:var(--bar);border-radius:6px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .3s}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 16px;font-size:13px;color:var(--mu)}
+.tools button{background:none;border:1px solid var(--bd);color:var(--mu);border-radius:8px;padding:5px 10px;cursor:pointer}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:5px 6px;min-width:0}
+input[type=number]{width:60px;text-align:center}
+.g{width:56px!important}
+details{background:var(--card);border:1px solid var(--bd);border-radius:12px;margin-bottom:10px}
+summary{cursor:pointer;padding:12px;display:flex;justify-content:space-between;gap:8px;font-weight:600;list-style:none}
+summary small{color:var(--mu);font-weight:400}
+.rows{padding:0 12px 10px}
+.r{display:grid;grid-template-columns:24px 1fr 38px 60px 60px 56px 110px;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--bd)}
+.r.h{font-size:11px;color:var(--mu);border-top:0}
+.r.m .nm{opacity:.55;text-decoration:line-through}
+.nm select{width:100%}
+.res{font-size:12px;line-height:1.25}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.mu{color:var(--mu)}
+@media(max-width:640px){.r{grid-template-columns:24px 1fr 60px 60px 56px;}.r .nm{grid-column:2/6}.r .ak{display:none}.r .res{grid-column:2/6}.r.h{display:none}}
+</style></head><body><main>
+<h1>Mezuniyetime Ne Kaldı?</h1>
+<div class="sub">SCÜ İnşaat Mühendisliği · 8 yarıyıllık ders planı · notların bu tarayıcıda saklanır</div>
+<div class="bar"><i id="pb"></i></div>
+<div class="stats" id="stats"></div>
+<div class="tools">Varsayılan vize ağırlığı %<input type="number" id="W" min="0" max="100" value="40" style="width:56px"> (dersin “ağ.” kutusundan tek tek değiştirebilirsin)
+<button onclick="expand(1)">Hepsini aç</button><button onclick="expand(0)">Hepsini kapat</button><button onclick="if(confirm('Tüm veriler silinsin mi?')){S={m:{},v:{},f:{},w:{},s:{},W:40};save();location.reload()}">Sıfırla</button></div>
+<div id="app"></div>
+<p class="sub">Not: GANO AKTS ağırlıklı hesaplanır. Muaf derslerde harf notu seçersen GANO’ya dahil olur, seçmezsen hesaba girmez. Geçme sınırı ortalama ≥ 50 (DD) kabul edilmiştir; harf aralıkları standart ölçektir, üniversitenin bağıl sistemi farklı sonuç verebilir. Muaf dersler tamamlanmış sayılır.</p>
+</main>
+<script>
+const SEL={I:[["Yapı Makinaları",2,3],["Yapı Mimarlığı Bilgisi",2,3],["İnş. Müh. Tahribatsız Ölçüm Yöntemleri",2,3]],
+II:[["Ahşap Yapılar",2,3],["Yol Üst Yapısı",2,3],["Kaya Mekaniği",2,3]],
+III:[["Prefabrik Yapılar",2,3],["Çevre Geotekniği",2,3],["Kaya Şev Stabilitesi",2,3]],
+IV:[["Su Getirme ve Kanalizasyon",3,4],["Su Yapıları",3,4]],
+V:[["Kıyı Mühendisliğine Giriş",2,3],["Zemin İncelemesi",2,3],["Trafik Mühendisliğine Giriş",2,3],["Sulama Kurutma",2,3],["Tünel Teknolojisi",2,3],["Patlama Teknolojisi",2,3]]};
+const SN={I:"Teknik Seçmeli I",II:"Teknik Seçmeli II",III:"Teknik Seçmeli III",IV:"Teknik Seçmeli IV",V:"Teknik Seçmeli V-VI"};
+// ad|kredi|akts
+const D=[
+["Türk Dili-I|2|2","Yabancı Dil 1|2|2","İş Hukuku|2|3","Genel Fizik 1|4|6","İnşaat Mühendisliğine Giriş|2|3","Teknik Resim|2|4","Genel Kimya|3|4","Genel Matematik 1|4|6"],
+["Türk Dili-II|2|2","Yabancı Dil 2|2|2","Ortak Alan Dışı Seçmeli Ders|0|3","Kariyer Planlama|0|2","Temel Bilgisayar Bilimleri|2.5|3","Genel Fizik 2|4|6","Statik|3|4","Bilgisayar Destekli Çizim|2|3","Mühendisler için Jeoloji|2|2","Genel Matematik 2|4|6"],
+["Atatürk İlkeleri ve İnkılap Tarihi-I|2|2","İş Güvenliği ve Sağlığı I|2|2","Malzeme Bilimi|2|3","Dinamik|3|6","Mukavemet 1|3|6","Diferansiyel Denklemler|3|5","İstatistik|2|3","Mühendislik Ekonomisi|2|3"],
+["Ortak Alan Dışı Seçmeli Ders|0|3","Atatürk İlkeleri ve İnkılap Tarihi-II|2|2","İş Güvenliği ve Sağlığı II|2|2","Sayısal Analiz|2|3","Yapı Malzemesi|2.5|3","Mukavemet 2|3|6","Topoğrafya|2|3","Mühendislik Matematiği|3|4","Hidroloji|2|3","@I|2|3"],
+["Yapı İşletmesi|2|3","Yapı Dinamiği|3|5","Akışkanlar Mekaniği|3|3","Zemin Mekaniği 1|3.5|6","Yapı Statiği 1|3|5","Ulaştırma 1|3|5","@II|2|3"],
+["Çelik Yapılar|3|4","Zemin Mekaniği 2|2.5|4","Ulaştırma 2|3|4","Hidrolik|3|5","Yapı Statiği 2|3|5","Betonarme 1|3|5","@III|2|3"],
+["Temel İnşaatı|3|5","Betonarme 2|3|6","Yapıların Deprem Hesabı|2|4","@IV|3|4","@V|2|3","@V|2|3","Uygulamalı Girişimcilik I|0|0","Bitirme Ödevi|1|5"],
+["Temel İnşaatı|3|5","Betonarme 2|3|6","Yapıların Deprem Hesabı|2|4","@IV|3|4","@V|2|3","@V|2|3","Uygulamalı Girişimcilik I|2|0","Bitirme Ödevi|1|5"],
+["Zorunlu Staj (45 iş günü)|0|7"]];
+const TOT=252,H=[[90,"AA",4],[85,"BA",3.5],[80,"BB",3],[75,"CB",2.5],[65,"CC",2],[58,"DC",1.5],[50,"DD",1],[40,"FD",.5],[0,"FF",0]];
+const hr=a=>H.find(h=>a>=h[0]);
+let S;try{S=JSON.parse(localStorage.getItem("mz")||"null")}catch(e){}
+S=S||{m:{},v:{},f:{},w:{},s:{},W:40};
+S.h=S.h||{};function save(){try{localStorage.setItem("mz",JSON.stringify(S))}catch(e){}}
+const C=[];let html="";
+D.forEach((sem,si)=>{
+ html+=`<details ${si<1?"open":""}><summary><span>${si==8?"Staj":(si+1)+". Yarıyıl"}</span><small id="s${si}"></small></summary><div class="rows"><div class="r h"><span></span><span>Muaf · Ders</span><span class="ak">AKTS</span><span>Vize</span><span>Final</span><span>Ağ.%</span><span>Sonuç</span></div>`;
+ sem.forEach((c,i)=>{const[n,k,a]=c.split("|"),id=si+"_"+i,sl=n[0]=="@"?n.slice(1):null;
+  C.push({id,si,sl,k:+k,a:+a});
+  const nm=sl?`<select onchange="S.s['${id}']=this.value;save();calc()"><option value="">${SN[sl]} – seç</option>${SEL[sl].map((o,j)=>`<option value="${j}" ${S.s[id]==j?"selected":""}>${o[0]}</option>`).join("")}</select>`:n;
+  const ex=si==8;
+  html+=`<div class="r" id="r${id}"><input type="checkbox" ${S.m[id]?"checked":""} title="${ex?"Tamamlandı":"Muaf"}" onchange="S.m['${id}']=this.checked;save();calc()"><span class="nm">${nm}</span><span class="ak mu" id="a${id}"></span>`+
+  (ex?`<span></span><span></span><span></span><span class="res mu">Tamamlandıysa tikle</span>`:
+  `<input type="number" min="0" max="100" placeholder="vize" value="${S.v[id]??""}" oninput="S.v['${id}']=this.value;save();calc()"><input type="number" min="0" max="100" placeholder="final" value="${S.f[id]??""}" oninput="S.f['${id}']=this.value;save();calc()"><input class="g" type="number" min="0" max="100" placeholder="${S.W}" value="${S.w[id]??""}" oninput="S.w['${id}']=this.value;save();calc()"><span class="res"><select class="hs" id="h${id}" style="display:none" onchange="S.h['${id}']=this.value;save();calc()"><option value="">Harf notu</option>${H.map(h=>`<option ${S.h[id]==h[1]?"selected":""}>${h[1]}</option>`).join("")}</select><span id="x${id}"></span></span>`)+`</div>`});
+ html+=`</div></details>`});
+document.getElementById("app").innerHTML=html;
+const Wi=document.getElementById("W");Wi.value=S.W;Wi.oninput=()=>{S.W=+Wi.value||0;save();calc()};
+function expand(o){document.querySelectorAll("details").forEach(d=>d.open=!!o)}
+function calc(){
+ let tk=0,dk=0,ta=0,da=0,P=0,PA=0;const sm={};
+ C.forEach(c=>{
+  let k=c.k,a=c.a;if(c.sl){const o=SEL[c.sl][S.s[c.id]];if(o){k=o[1];a=o[2]}}
+  const m=!!S.m[c.id];tk+=k;ta+=a;
+  const row=document.getElementById("r"+c.id),ax=document.getElementById("a"+c.id),x=document.getElementById("x"+c.id);
+  row.classList.toggle("m",m);ax.textContent=a;const hs=document.getElementById("h"+c.id);if(hs)hs.style.display=m?"inline-block":"none";row.querySelectorAll("input[type=number]").forEach(i=>{i.disabled=m;i.style.opacity=m?.35:1;i.style.visibility=m?"hidden":"visible"});
+  const q=sm[c.si]=sm[c.si]||{ta:0,da:0,P:0,PA:0};q.ta+=a;
+  let done=m,txt="";
+  if(m){const hh=H.find(z=>z[1]==S.h[c.id]);txt=hh?`<span class="ok">Muaf · ${hh[1]}</span>`:'<span class="ok">Muaf</span>';if(hh){P+=hh[2]*a;PA+=a;q.P+=hh[2]*a;q.PA+=a}}
+  else if(x){
+   const vs=S.v[c.id],fs=S.f[c.id],v=parseFloat(vs),f=parseFloat(fs),w=(S.w[c.id]!==undefined&&S.w[c.id]!==""?+S.w[c.id]:S.W)/100;
+   if(vs!==""&&fs!==""&&vs!==undefined&&fs!==undefined&&!isNaN(v)&&!isNaN(f)){
+    const av=v*w+f*(1-w),h=hr(av);done=av>=50;
+    txt=`<span class="${done?"ok":"bad"}">${av.toFixed(1)} · ${h[1]}</span>`;
+    P+=h[2]*a;PA+=a;q.P+=h[2]*a;q.PA+=a;
+   }else if(!isNaN(v)&&vs!==""&&vs!==undefined&&w<1){
+    const nd=t=>{const r=(t-v*w)/(1-w);return r>100?"imkânsız":r<=0?"0":Math.ceil(r)};
+    txt=`<span class="mu">Final: DD için <b>${nd(50)}</b>, CC için <b>${nd(65)}</b></span>`;
+   }
+  }
+  if(x)x.innerHTML=txt;
+  if(done){dk+=k;da+=a;q.da+=a}
+ });
+ D.forEach((_,si)=>{const q=sm[si];document.getElementById("s"+si).textContent=`${q.da}/${q.ta} AKTS`+(q.PA?` · ort. ${(q.P/q.PA).toFixed(2)}`:"")});
+ const st=[[(PA?(P/PA).toFixed(2):"–"),"GANO (4.00 üzerinden)"],[da+" / "+ta,"Tamamlanan AKTS"],[Math.max(0,TOT-da),"Kalan AKTS (252 hedef)"],[Math.max(0,tk-dk),"Kalan kredi"]];
+ document.getElementById("stats").innerHTML=st.map(s=>`<div class="st"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("");
+ document.getElementById("pb").style.width=Math.min(100,da/ta*100)+"%";
+}
+calc();
+</script></body></html>
