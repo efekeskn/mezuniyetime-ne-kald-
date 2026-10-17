@@ -2,6 +2,8 @@
 
 Sivas Cumhuriyet Üniversitesi İnşaat Mühendisliği için 8 yarıyıllık ders planı, not ve mezuniyet takip uygulaması.
 
+🌐 **Canlı Site:** [https://efekeskn.github.io/mezuniyetime-ne-kald-/](https://efekeskn.github.io/mezuniyetime-ne-kald-/)
+
 ## Özellikler
 - 8 yarıyıllık SCÜ İnşaat Mühendisliği müfredatı
 - Seçmeli ders havuzları ve yönetimi
