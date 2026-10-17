@@ -2,6 +2,7 @@
 <html lang="tr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mezuniyetime Ne Kaldı? – İnşaat Müh. SCÜ</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f6f5f1;--card:#fff;--tx:#1d1f23;--mu:#6b6f76;--bd:#e2e0d8;--ac:#c2410c;--ok:#15803d;--bad:#b91c1c;--bar:#e8e6df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--card:#1f2126;--tx:#ececec;--mu:#9a9ea6;--bd:#33363d;--ac:#fb923c;--ok:#4ade80;--bad:#f87171;--bar:#2e3138}}
@@ -10,15 +11,28 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:920px;margin:0 auto;padding:16px}
-h1{font-size:22px;margin:4px 0 2px}
-.sub{color:var(--mu);font-size:13px;margin-bottom:14px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+
+/* Header & Profile pill */
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0 10px;flex-wrap:wrap}
+.hdr-titles{flex:1;min-width:240px}
+h1{font-size:22px;margin:0 0 2px}
+.sub{color:var(--mu);font-size:13px;margin-bottom:6px}
+
+.profile-pill{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:30px;padding:6px 14px 6px 8px;cursor:pointer;color:var(--tx);font:inherit;transition:border-color .2s,box-shadow .2s;text-align:left}
+.profile-pill:hover{border-color:var(--ac);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.p-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac),#e11d48);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;text-transform:uppercase;flex-shrink:0}
+.p-info{display:flex;flex-direction:column;line-height:1.2}
+.p-name{font-weight:600;font-size:13px}
+.p-status{font-size:11px;color:var(--mu)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-bottom:12px}
 .st{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
 .st b{display:block;font-size:24px}.st span{color:var(--mu);font-size:12px}
 .bar{height:10px;background:var(--bar);border-radius:6px;overflow:hidden;margin-bottom:6px}
 .bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .3s}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 16px;font-size:13px;color:var(--mu)}
 .tools button{background:none;border:1px solid var(--bd);color:var(--mu);border-radius:8px;padding:5px 10px;cursor:pointer}
+.tools button:hover{color:var(--tx);border-color:var(--tx)}
 input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:5px 6px;min-width:0}
 input[type=number]{width:60px;text-align:center}
 .g{width:56px!important}
@@ -32,17 +46,184 @@ summary small{color:var(--mu);font-weight:400}
 .nm select{width:100%}
 .res{font-size:12px;line-height:1.25}
 .ok{color:var(--ok)}.bad{color:var(--bad)}.mu{color:var(--mu)}
-@media(max-width:640px){.r{grid-template-columns:24px 1fr 60px 60px 56px;}.r .nm{grid-column:2/6}.r .ak{display:none}.r .res{grid-column:2/6}.r.h{display:none}}
+
+/* Modal Dialog */
+dialog:modal{overscroll-behavior:contain;border:none;border-radius:16px;background:var(--card);color:var(--tx);max-width:520px;width:calc(100% - 32px);padding:0;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+dialog::backdrop{overflow:hidden;overscroll-behavior:contain;background-color:rgba(0,0,0,0.5);backdrop-filter:blur(4px)}
+.dlg-wrap{padding:20px;display:flex;flex-direction:column;gap:14px}
+.dlg-hdr{display:flex;justify-content:space-between;align-items:center}
+.dlg-hdr h2{margin:0;font-size:18px}
+.dlg-close{background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;padding:4px 8px;line-height:1}
+.dlg-close:hover{color:var(--tx)}
+.dlg-tabs{display:flex;gap:6px;border-bottom:1px solid var(--bd);padding-bottom:10px}
+.tab-btn{background:none;border:none;font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;cursor:pointer;color:var(--mu);font-weight:500}
+.tab-btn.active{background:var(--bg);color:var(--ac);font-weight:600}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+.form-grid{display:grid;gap:10px}
+.form-grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu);font-weight:500}
+.form-grid input{width:100%;font-size:14px;padding:8px 10px}
+
+.prof-card{margin-top:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--bd);font-size:13px}
+.prof-target-bar{margin:8px 0 4px;height:8px;background:var(--bar);border-radius:4px;overflow:hidden}
+.prof-target-bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+
+.dlg-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn-primary{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.btn-primary:hover{opacity:.9}
+.btn-sec{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}
+.btn-sec:hover{border-color:var(--tx)}
+
+.qr-box{text-align:center;padding:12px;background:var(--bg);border-radius:12px;border:1px solid var(--bd)}
+.qr-img{background:#fff;padding:8px;border-radius:8px;margin:8px auto;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.qr-desc{font-size:13px;color:var(--mu);margin:0 0 10px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:all .3s ease;pointer-events:none;z-index:9999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  .r{grid-template-columns:24px 1fr 60px 60px 56px;}.r .nm{grid-column:2/6}.r .ak{display:none}.r .res{grid-column:2/6}.r.h{display:none}
+  .hdr{flex-direction:column;align-items:stretch}
+  .profile-pill{justify-content:center}
+}
 </style></head><body><main>
-<h1>Mezuniyetime Ne Kaldı?</h1>
-<div class="sub">SCÜ İnşaat Mühendisliği · 8 yarıyıllık ders planı · notların bu tarayıcıda saklanır</div>
+
+<header class="hdr">
+  <div class="hdr-titles">
+    <h1>Mezuniyetime Ne Kaldı?</h1>
+    <div class="sub">SCÜ İnşaat Mühendisliği · 8 yarıyıllık ders planı</div>
+  </div>
+  <button id="profileBtn" class="profile-pill" onclick="openProfileModal()" aria-label="Profil ve Cihaz Senkronizasyonu">
+    <div class="p-avatar" id="hdrAvatar">EK</div>
+    <div class="p-info">
+      <span class="p-name" id="hdrName">Profil Oluştur</span>
+      <span class="p-status" id="hdrStatus">📱 Telefona Aktar</span>
+    </div>
+  </button>
+</header>
+
 <div class="bar"><i id="pb"></i></div>
 <div class="stats" id="stats"></div>
-<div class="tools">Varsayılan vize ağırlığı %<input type="number" id="W" min="0" max="100" value="40" style="width:56px"> (dersin “ağ.” kutusundan tek tek değiştirebilirsin)
-<button onclick="expand(1)">Hepsini aç</button><button onclick="expand(0)">Hepsini kapat</button><button onclick="if(confirm('Tüm veriler silinsin mi?')){S={m:{},v:{},f:{},w:{},s:{},W:40};save();location.reload()}">Sıfırla</button></div>
+
+<div class="tools">
+  Varsayılan vize ağırlığı %<input type="number" id="W" min="0" max="100" value="40" style="width:56px">
+  <button onclick="expand(1)">Hepsini aç</button>
+  <button onclick="expand(0)">Hepsini kapat</button>
+  <button onclick="openProfileModal('sync')">📲 Telefonda Aç (QR)</button>
+  <button onclick="if(confirm('Tüm veriler ve notlar sıfırlansın mı?')){S={m:{},v:{},f:{},w:{},s:{},h:{},W:40,profile:S.profile||{}};save();location.reload()}">Sıfırla</button>
+</div>
+
 <div id="app"></div>
-<p class="sub">Not: GANO AKTS ağırlıklı hesaplanır. Muaf derslerde harf notu seçersen GANO’ya dahil olur, seçmezsen hesaba girmez. Geçme sınırı ortalama ≥ 50 (DD) kabul edilmiştir; harf aralıkları standart ölçektir, üniversitenin bağıl sistemi farklı sonuç verebilir. Muaf dersler tamamlanmış sayılır.</p>
+
+<p class="sub">Not: GANO AKTS ağırlıklı hesaplanır. Muaf derslerde harf notu seçersen GANO’ya dahil olur, seçmezsen hesaba girmez. Geçme sınırı ortalama ≥ 50 (DD) kabul edilmiştir; harf aralıkları standart ölçektir. Muaf dersler tamamlanmış sayılır.</p>
 </main>
+
+<!-- Profile & Sync Dialog -->
+<dialog id="profileDialog" closedby="any" aria-labelledby="profileDialogTitle">
+  <div class="dlg-wrap">
+    <div class="dlg-hdr">
+      <h2 id="profileDialogTitle">👤 Öğrenci Profili & Senkronizasyon</h2>
+      <button type="button" class="dlg-close" onclick="closeProfileModal()" aria-label="Kapat">&times;</button>
+    </div>
+
+    <div class="dlg-tabs">
+      <button type="button" class="tab-btn active" id="btnTabProf" onclick="switchTab('prof')">📋 Profilim</button>
+      <button type="button" class="tab-btn" id="btnTabSync" onclick="switchTab('sync')">📲 Telefona Aktar (QR)</button>
+      <button type="button" class="tab-btn" id="btnTabCloud" onclick="switchTab('cloud')">☁️ Bulut Hesabı</button>
+    </div>
+
+    <!-- Tab 1: Profile -->
+    <div id="tab-prof" class="tab-pane active">
+      <div class="form-grid">
+        <label>
+          <span>Ad Soyad</span>
+          <input type="text" id="profName" placeholder="örn. Muhammed Efe Keskin" oninput="updateProfilePreview()">
+        </label>
+        <label>
+          <span>Öğrenci Numarası</span>
+          <input type="text" id="profNo" placeholder="örn. 22296577" oninput="updateProfilePreview()">
+        </label>
+        <label>
+          <span>Bölüm / Fakülte</span>
+          <input type="text" id="profDept" value="SCÜ İnşaat Mühendisliği" oninput="updateProfilePreview()">
+        </label>
+        <label>
+          <span>Hedef GANO (0.00 - 4.00)</span>
+          <input type="number" step="0.01" min="0" max="4" id="profTargetGano" placeholder="örn. 3.20" oninput="updateProfilePreview()">
+        </label>
+      </div>
+
+      <div class="prof-card" id="profCardPreview">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <b id="cardDispName">Öğrenci</b>
+          <span class="mu" id="cardDispNo">#</span>
+        </div>
+        <div class="mu" style="font-size:12px;margin:2px 0 6px" id="cardDispDept">SCÜ İnşaat Mühendisliği</div>
+        <div style="font-size:12px;display:flex;justify-content:space-between" id="cardGanoRow">
+          <span>Mevcut: <b id="cardCurGano">–</b></span>
+          <span>Hedef: <b id="cardTgtGano">–</b></span>
+        </div>
+        <div class="prof-target-bar"><i id="cardTargetBar"></i></div>
+        <div class="mu" style="font-size:11px" id="cardTargetMsg">Hedef GANO belirleyerek motivasyonunu takip et.</div>
+      </div>
+
+      <div class="dlg-actions">
+        <button type="button" class="btn-primary" onclick="saveProfileForm()">Profili Kaydet</button>
+        <button type="button" class="btn-sec" onclick="switchTab('sync')">📲 Telefona Aktar</button>
+      </div>
+    </div>
+
+    <!-- Tab 2: Sync / QR Code -->
+    <div id="tab-sync" class="tab-pane">
+      <div class="qr-box">
+        <p class="qr-desc">Telefonunun kamerasını aşağıdaki QR koda tut. Tüm notların ve profilin <b>anında telefonunda açılır ve kaydedilir</b>.</p>
+        <div class="qr-img">
+          <img id="qrImage" width="200" height="200" alt="Eşitleme QR Kodu">
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button type="button" class="btn-primary" onclick="copySyncUrl()">📋 Eşitleme Bağlantısını Kopyala</button>
+        </div>
+      </div>
+      <div class="prof-card" style="margin-top:10px">
+        <b style="display:block;margin-bottom:4px">💡 Nasıl çalışır?</b>
+        <span class="mu">Kamera kodu okuduğunda telefonunda aynı sayfa açılır ve "Profil ve notlar eşitlendi" uyarısı verir. Bundan sonra telefonunda da kaldığın yerden devam edebilirsin.</span>
+      </div>
+    </div>
+
+    <!-- Tab 3: Cloud / Supabase -->
+    <div id="tab-cloud" class="tab-pane">
+      <div class="form-grid">
+        <p class="sub" style="margin:0">Cihazlar arasında hiçbir şey taratmadan otomatik eşitlensin istersen ücretsiz Supabase bulut veritabanını bağlayabilirsin:</p>
+        <label>
+          <span>Supabase Project URL</span>
+          <input type="text" id="sbUrl" placeholder="https://xyz.supabase.co">
+        </label>
+        <label>
+          <span>Supabase Anon Key</span>
+          <input type="password" id="sbKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </label>
+        <label>
+          <span>E-posta</span>
+          <input type="email" id="sbEmail" placeholder="ornek@ogrenci.scu.edu.tr">
+        </label>
+        <label>
+          <span>Şifre</span>
+          <input type="password" id="sbPass" placeholder="••••••••">
+        </label>
+      </div>
+      <div class="dlg-actions">
+        <button type="button" class="btn-primary" onclick="handleSupabaseAuth('login')">Giriş Yap</button>
+        <button type="button" class="btn-sec" onclick="handleSupabaseAuth('signup')">Kayıt Ol</button>
+      </div>
+      <div id="sbMsg" class="mu" style="font-size:12px;margin-top:8px"></div>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
 const SEL={I:[["Yapı Makinaları",2,3],["Yapı Mimarlığı Bilgisi",2,3],["İnş. Müh. Tahribatsız Ölçüm Yöntemleri",2,3]],
 II:[["Ahşap Yapılar",2,3],["Yol Üst Yapısı",2,3],["Kaya Mekaniği",2,3]],
@@ -50,6 +231,7 @@ III:[["Prefabrik Yapılar",2,3],["Çevre Geotekniği",2,3],["Kaya Şev Stabilite
 IV:[["Su Getirme ve Kanalizasyon",3,4],["Su Yapıları",3,4]],
 V:[["Kıyı Mühendisliğine Giriş",2,3],["Zemin İncelemesi",2,3],["Trafik Mühendisliğine Giriş",2,3],["Sulama Kurutma",2,3],["Tünel Teknolojisi",2,3],["Patlama Teknolojisi",2,3]]};
 const SN={I:"Teknik Seçmeli I",II:"Teknik Seçmeli II",III:"Teknik Seçmeli III",IV:"Teknik Seçmeli IV",V:"Teknik Seçmeli V-VI"};
+
 // ad|kredi|akts
 const D=[
 ["Türk Dili-I|2|2","Yabancı Dil 1|2|2","İş Hukuku|2|3","Genel Fizik 1|4|6","İnşaat Mühendisliğine Giriş|2|3","Teknik Resim|2|4","Genel Kimya|3|4","Genel Matematik 1|4|6"],
@@ -61,11 +243,44 @@ const D=[
 ["Temel İnşaatı|3|5","Betonarme 2|3|6","Yapıların Deprem Hesabı|2|4","@IV|3|4","@V|2|3","@V|2|3","Uygulamalı Girişimcilik I|0|0","Bitirme Ödevi|1|5"],
 ["Temel İnşaatı|3|5","Betonarme 2|3|6","Yapıların Deprem Hesabı|2|4","@IV|3|4","@V|2|3","@V|2|3","Uygulamalı Girişimcilik I|2|0","Bitirme Ödevi|1|5"],
 ["Zorunlu Staj (45 iş günü)|0|7"]];
+
 const TOT=252,H=[[90,"AA",4],[85,"BA",3.5],[80,"BB",3],[75,"CB",2.5],[65,"CC",2],[58,"DC",1.5],[50,"DD",1],[40,"FD",.5],[0,"FF",0]];
 const hr=a=>H.find(h=>a>=h[0]);
+
 let S;try{S=JSON.parse(localStorage.getItem("mz")||"null")}catch(e){}
-S=S||{m:{},v:{},f:{},w:{},s:{},W:40};
-S.h=S.h||{};function save(){try{localStorage.setItem("mz",JSON.stringify(S))}catch(e){}}
+S=S||{m:{},v:{},f:{},w:{},s:{},h:{},W:40,profile:{}};
+S.h=S.h||{};
+S.profile=S.profile||{name:"",studentNo:"",department:"SCÜ İnşaat Mühendisliği",targetGano:""};
+
+function save(){
+  try{localStorage.setItem("mz",JSON.stringify(S))}catch(e){}
+}
+
+/* URL Sync Check on load */
+(function checkUrlSync(){
+  const hash=window.location.hash;
+  if(hash&&hash.startsWith("#sync=")){
+    try{
+      const b64=hash.slice(6);
+      const json=decodeURIComponent(escape(atob(b64)));
+      const data=JSON.parse(json);
+      if(data){
+        if(data.p) S.profile=Object.assign(S.profile||{},data.p);
+        if(data.m) S.m=data.m;
+        if(data.v) S.v=data.v;
+        if(data.f) S.f=data.f;
+        if(data.w) S.w=data.w;
+        if(data.s) S.s=data.s;
+        if(data.h) S.h=data.h;
+        if(data.W!==undefined) S.W=data.W;
+        save();
+        history.replaceState(null,"",window.location.pathname+window.location.search);
+        setTimeout(()=>showToast("✅ Profil ve tüm notlar başarıyla bu cihaza aktarıldı!"),400);
+      }
+    }catch(err){console.error("Sync decode error",err)}
+  }
+})();
+
 const C=[];let html="";
 D.forEach((sem,si)=>{
  html+=`<details ${si<1?"open":""}><summary><span>${si==8?"Staj":(si+1)+". Yarıyıl"}</span><small id="s${si}"></small></summary><div class="rows"><div class="r h"><span></span><span>Muaf · Ders</span><span class="ak">AKTS</span><span>Vize</span><span>Final</span><span>Ağ.%</span><span>Sonuç</span></div>`;
@@ -78,8 +293,11 @@ D.forEach((sem,si)=>{
   `<input type="number" min="0" max="100" placeholder="vize" value="${S.v[id]??""}" oninput="S.v['${id}']=this.value;save();calc()"><input type="number" min="0" max="100" placeholder="final" value="${S.f[id]??""}" oninput="S.f['${id}']=this.value;save();calc()"><input class="g" type="number" min="0" max="100" placeholder="${S.W}" value="${S.w[id]??""}" oninput="S.w['${id}']=this.value;save();calc()"><span class="res"><select class="hs" id="h${id}" style="display:none" onchange="S.h['${id}']=this.value;save();calc()"><option value="">Harf notu</option>${H.map(h=>`<option ${S.h[id]==h[1]?"selected":""}>${h[1]}</option>`).join("")}</select><span id="x${id}"></span></span>`)+`</div>`});
  html+=`</div></details>`});
 document.getElementById("app").innerHTML=html;
+
 const Wi=document.getElementById("W");Wi.value=S.W;Wi.oninput=()=>{S.W=+Wi.value||0;save();calc()};
 function expand(o){document.querySelectorAll("details").forEach(d=>d.open=!!o)}
+
+let currentGano="–";
 function calc(){
  let tk=0,dk=0,ta=0,da=0,P=0,PA=0;const sm={};
  C.forEach(c=>{
@@ -105,9 +323,249 @@ function calc(){
   if(done){dk+=k;da+=a;q.da+=a}
  });
  D.forEach((_,si)=>{const q=sm[si];document.getElementById("s"+si).textContent=`${q.da}/${q.ta} AKTS`+(q.PA?` · ort. ${(q.P/q.PA).toFixed(2)}`:"")});
- const st=[[(PA?(P/PA).toFixed(2):"–"),"GANO (4.00 üzerinden)"],[da+" / "+ta,"Tamamlanan AKTS"],[Math.max(0,TOT-da),"Kalan AKTS (252 hedef)"],[Math.max(0,tk-dk),"Kalan kredi"]];
+ currentGano=PA?(P/PA).toFixed(2):"–";
+
+ const st=[
+   [currentGano,"GANO (4.00 üzerinden)"],
+   [da+" / "+ta,"Tamamlanan AKTS"],
+   [Math.max(0,TOT-da),"Kalan AKTS (252 hedef)"],
+   [Math.max(0,tk-dk),"Kalan kredi"]
+ ];
+ if(S.profile && S.profile.targetGano){
+   st.push([parseFloat(S.profile.targetGano).toFixed(2),"Hedef GANO"]);
+ }
  document.getElementById("stats").innerHTML=st.map(s=>`<div class="st"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("");
  document.getElementById("pb").style.width=Math.min(100,da/ta*100)+"%";
+ updateProfileUI();
 }
+
+/* Profile & Sync UI Logic */
+function updateProfileUI(){
+  const p=S.profile||{};
+  const name=p.name&&p.name.trim()?p.name.trim():"";
+  const hdrName=document.getElementById("hdrName");
+  const hdrStatus=document.getElementById("hdrStatus");
+  const hdrAvatar=document.getElementById("hdrAvatar");
+
+  if(name){
+    hdrName.textContent=name;
+    hdrStatus.textContent=(p.studentNo?`#${p.studentNo} · `:"")+"📱 Eşitle";
+    const parts=name.split(" ");
+    const initials=(parts[0][0]+(parts.length>1?parts[parts.length-1][0]:"")).toUpperCase();
+    hdrAvatar.textContent=initials;
+  }else{
+    hdrName.textContent="Profil Oluştur";
+    hdrStatus.textContent="📱 Telefona Aktar";
+    hdrAvatar.textContent="👤";
+  }
+
+  // Preview inside modal
+  const cardDispName=document.getElementById("cardDispName");
+  const cardDispNo=document.getElementById("cardDispNo");
+  const cardDispDept=document.getElementById("cardDispDept");
+  const cardCurGano=document.getElementById("cardCurGano");
+  const cardTgtGano=document.getElementById("cardTgtGano");
+  const cardTargetBar=document.getElementById("cardTargetBar");
+  const cardTargetMsg=document.getElementById("cardTargetMsg");
+
+  if(cardDispName){
+    cardDispName.textContent=name||"Öğrenci";
+    cardDispNo.textContent=p.studentNo?`#${p.studentNo}`:"";
+    cardDispDept.textContent=p.department||"SCÜ İnşaat Mühendisliği";
+    cardCurGano.textContent=currentGano;
+    const tgt=parseFloat(p.targetGano);
+    if(!isNaN(tgt)&&tgt>0){
+      cardTgtGano.textContent=tgt.toFixed(2);
+      const curVal=parseFloat(currentGano);
+      if(!isNaN(curVal)){
+        const pct=Math.min(100,Math.max(0,(curVal/tgt)*100));
+        cardTargetBar.style.width=pct+"%";
+        if(curVal>=tgt){
+          cardTargetMsg.innerHTML=`<span class="ok">🎉 Tebrikler! Hedef GANO'na ulaştın (${curVal.toFixed(2)} ≥ ${tgt.toFixed(2)})</span>`;
+        }else{
+          const diff=(tgt-curVal).toFixed(2);
+          cardTargetMsg.innerHTML=`Hedefe ulaşmaya <b>${diff}</b> GANO puanı kaldı.`;
+        }
+      }
+    }else{
+      cardTgtGano.textContent="–";
+      cardTargetBar.style.width="0%";
+      cardTargetMsg.textContent="Hedef GANO belirleyerek motivasyonunu takip et.";
+    }
+  }
+}
+
+function updateProfilePreview(){
+  S.profile=S.profile||{};
+  S.profile.name=document.getElementById("profName").value;
+  S.profile.studentNo=document.getElementById("profNo").value;
+  S.profile.department=document.getElementById("profDept").value;
+  S.profile.targetGano=document.getElementById("profTargetGano").value;
+  updateProfileUI();
+}
+
+function saveProfileForm(){
+  updateProfilePreview();
+  save();
+  calc();
+  showToast("✅ Profil bilgileri kaydedildi!");
+  closeProfileModal();
+}
+
+const profileDialog=document.getElementById("profileDialog");
+
+// Modern Web Guidance: Light-dismiss fallback for browsers without closedby support
+if(!('closedBy' in HTMLDialogElement.prototype)){
+  profileDialog.addEventListener('click',(event)=>{
+    if(event.target!==profileDialog) return;
+    const rect=profileDialog.getBoundingClientRect();
+    const isContent=(
+      rect.top<=event.clientY&&event.clientY<=rect.top+rect.height&&
+      rect.left<=event.clientX&&event.clientX<=rect.left+rect.width
+    );
+    if(!isContent) profileDialog.close();
+  });
+}
+
+function openProfileModal(tab){
+  const p=S.profile||{};
+  document.getElementById("profName").value=p.name||"";
+  document.getElementById("profNo").value=p.studentNo||"";
+  document.getElementById("profDept").value=p.department||"SCÜ İnşaat Mühendisliği";
+  document.getElementById("profTargetGano").value=p.targetGano||"";
+  updateProfileUI();
+
+  if(tab){
+    switchTab(tab);
+  }else{
+    switchTab("prof");
+  }
+  profileDialog.showModal();
+}
+
+function closeProfileModal(){
+  profileDialog.close();
+}
+
+function switchTab(tabId){
+  document.querySelectorAll(".dlg-tabs .tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
+  
+  if(tabId==="prof"){
+    document.getElementById("btnTabProf").classList.add("active");
+    document.getElementById("tab-prof").classList.add("active");
+  }else if(tabId==="sync"){
+    document.getElementById("btnTabSync").classList.add("active");
+    document.getElementById("tab-sync").classList.add("active");
+    generateQrCode();
+  }else if(tabId==="cloud"){
+    document.getElementById("btnTabCloud").classList.add("active");
+    document.getElementById("tab-cloud").classList.add("active");
+  }
+}
+
+function getSyncUrl(){
+  const payload={
+    p: S.profile||{},
+    m: S.m||{},
+    v: S.v||{},
+    f: S.f||{},
+    w: S.w||{},
+    s: S.s||{},
+    h: S.h||{},
+    W: S.W||40
+  };
+  const json=JSON.stringify(payload);
+  const b64=btoa(unescape(encodeURIComponent(json)));
+  return `${window.location.origin}${window.location.pathname}#sync=${b64}`;
+}
+
+function generateQrCode(){
+  const url=getSyncUrl();
+  const qrImg=document.getElementById("qrImage");
+  qrImg.src=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}`;
+}
+
+function copySyncUrl(){
+  const url=getSyncUrl();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>{
+      showToast("📋 Eşitleme bağlantısı kopyalandı! Kendine WhatsApp veya mesajla gönderebilirsin.");
+    }).catch(()=>{
+      prompt("Eşitleme bağlantısını kopyala:",url);
+    });
+  }else{
+    prompt("Eşitleme bağlantısını kopyala:",url);
+  }
+}
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3500);
+}
+
+/* Supabase Cloud Sync Integration */
+let supabaseClient=null;
+function initSupabase(){
+  const url=document.getElementById("sbUrl").value.trim()||localStorage.getItem("sb_url");
+  const key=document.getElementById("sbKey").value.trim()||localStorage.getItem("sb_key");
+  if(url&&key&&window.supabase){
+    try{
+      supabaseClient=window.supabase.createClient(url,key);
+      localStorage.setItem("sb_url",url);
+      localStorage.setItem("sb_key",key);
+      return true;
+    }catch(e){console.error(e)}
+  }
+  return false;
+}
+
+async function handleSupabaseAuth(type){
+  const msgEl=document.getElementById("sbMsg");
+  msgEl.textContent="İşlem yapılıyor...";
+  if(!initSupabase()){
+    msgEl.textContent="⚠️ Lütfen geçerli bir Supabase URL ve Anon Key girin.";
+    return;
+  }
+  const email=document.getElementById("sbEmail").value.trim();
+  const password=document.getElementById("sbPass").value.trim();
+  if(!email||!password){
+    msgEl.textContent="⚠️ Lütfen e-posta ve şifre girin.";
+    return;
+  }
+  try{
+    let res;
+    if(type==="signup"){
+      res=await supabaseClient.auth.signUp({
+        email,
+        password,
+        options:{data:{profile:S.profile,grades:S}}
+      });
+      if(res.error) throw res.error;
+      msgEl.innerHTML=`<span class="ok">✅ Kayıt başarılı! Lütfen varsa e-posta onayını yapın.</span>`;
+    }else{
+      res=await supabaseClient.auth.signInWithPassword({email,password});
+      if(res.error) throw res.error;
+      const user=res.data.user;
+      if(user && user.user_metadata && user.user_metadata.grades){
+        S=Object.assign(S,user.user_metadata.grades);
+        save();
+        calc();
+        msgEl.innerHTML=`<span class="ok">✅ Giriş yapıldı ve buluttaki notlar yüklendi!</span>`;
+        showToast("☁️ Buluttaki notlarınız başarıyla yüklendi!");
+        setTimeout(closeProfileModal,1500);
+      }else{
+        // upload current
+        await supabaseClient.auth.updateUser({data:{profile:S.profile,grades:S}});
+        msgEl.innerHTML=`<span class="ok">✅ Giriş yapıldı ve mevcut notlar buluta yedeklendi!</span>`;
+      }
+    }
+  }catch(err){
+    msgEl.innerHTML=`<span class="bad">Hata: ${err.message||err}</span>`;
+  }
+}
+
 calc();
 </script></body></html>
