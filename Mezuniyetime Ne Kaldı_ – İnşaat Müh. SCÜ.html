@@ -2,7 +2,6 @@
 <html lang="tr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mezuniyetime Ne Kaldı? – İnşaat Müh. SCÜ</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f6f5f1;--card:#fff;--tx:#1d1f23;--mu:#6b6f76;--bd:#e2e0d8;--ac:#c2410c;--ok:#15803d;--bad:#b91c1c;--bar:#e8e6df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--card:#1f2126;--tx:#ececec;--mu:#9a9ea6;--bd:#33363d;--ac:#fb923c;--ok:#4ade80;--bad:#f87171;--bar:#2e3138}}
@@ -23,7 +22,7 @@ h1{font-size:22px;margin:0 0 2px}
 .p-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac),#e11d48);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;text-transform:uppercase;flex-shrink:0}
 .p-info{display:flex;flex-direction:column;line-height:1.2}
 .p-name{font-weight:600;font-size:13px}
-.p-status{font-size:11px;color:var(--mu)}
+.p-status{font-size:11px;color:var(--ok)}
 
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-bottom:12px}
 .st{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
@@ -33,6 +32,7 @@ h1{font-size:22px;margin:0 0 2px}
 .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 16px;font-size:13px;color:var(--mu)}
 .tools button{background:none;border:1px solid var(--bd);color:var(--mu);border-radius:8px;padding:5px 10px;cursor:pointer}
 .tools button:hover{color:var(--tx);border-color:var(--tx)}
+.tools button.active-action{color:var(--ac);border-color:var(--ac);font-weight:500}
 input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:5px 6px;min-width:0}
 input[type=number]{width:60px;text-align:center}
 .g{width:56px!important}
@@ -75,10 +75,6 @@ dialog::backdrop{overflow:hidden;overscroll-behavior:contain;background-color:rg
 .btn-sec{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}
 .btn-sec:hover{border-color:var(--tx)}
 
-.qr-box{text-align:center;padding:12px;background:var(--bg);border-radius:12px;border:1px solid var(--bd)}
-.qr-img{background:#fff;padding:8px;border-radius:8px;margin:8px auto;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.qr-desc{font-size:13px;color:var(--mu);margin:0 0 10px}
-
 /* Toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:all .3s ease;pointer-events:none;z-index:9999}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -95,11 +91,11 @@ dialog::backdrop{overflow:hidden;overscroll-behavior:contain;background-color:rg
     <h1>Mezuniyetime Ne Kaldı?</h1>
     <div class="sub">SCÜ İnşaat Mühendisliği · 8 yarıyıllık ders planı</div>
   </div>
-  <button id="profileBtn" class="profile-pill" onclick="openProfileModal()" aria-label="Profil ve Cihaz Senkronizasyonu">
+  <button id="profileBtn" class="profile-pill" onclick="openProfileModal()" aria-label="Profil ve GitHub Veritabanı">
     <div class="p-avatar" id="hdrAvatar">EK</div>
     <div class="p-info">
-      <span class="p-name" id="hdrName">Profil Oluştur</span>
-      <span class="p-status" id="hdrStatus">📱 Telefona Aktar</span>
+      <span class="p-name" id="hdrName">Muhammed Efe Keskin</span>
+      <span class="p-status" id="hdrStatus">🟢 GitHub Veritabanı</span>
     </div>
   </button>
 </header>
@@ -111,8 +107,9 @@ dialog::backdrop{overflow:hidden;overscroll-behavior:contain;background-color:rg
   Varsayılan vize ağırlığı %<input type="number" id="W" min="0" max="100" value="40" style="width:56px">
   <button onclick="expand(1)">Hepsini aç</button>
   <button onclick="expand(0)">Hepsini kapat</button>
-  <button onclick="openProfileModal('sync')">📲 Telefonda Aç (QR)</button>
-  <button onclick="if(confirm('Tüm veriler ve notlar sıfırlansın mı?')){S={m:{},v:{},f:{},w:{},s:{},h:{},W:40,profile:S.profile||{}};save();location.reload()}">Sıfırla</button>
+  <button class="active-action" onclick="fetchFromGitHub(true)">🔄 GitHub'dan Çek</button>
+  <button class="active-action" onclick="saveToGitHub()">☁️ GitHub'a Kaydet</button>
+  <button onclick="if(confirm('Tüm yerel notlar sıfırlansın mı?')){S={m:{},v:{},f:{},w:{},s:{},h:{},W:40,profile:S.profile||{}};save();location.reload()}">Sıfırla</button>
 </div>
 
 <div id="app"></div>
@@ -120,18 +117,17 @@ dialog::backdrop{overflow:hidden;overscroll-behavior:contain;background-color:rg
 <p class="sub">Not: GANO AKTS ağırlıklı hesaplanır. Muaf derslerde harf notu seçersen GANO’ya dahil olur, seçmezsen hesaba girmez. Geçme sınırı ortalama ≥ 50 (DD) kabul edilmiştir; harf aralıkları standart ölçektir. Muaf dersler tamamlanmış sayılır.</p>
 </main>
 
-<!-- Profile & Sync Dialog -->
+<!-- Profile & GitHub Database Dialog -->
 <dialog id="profileDialog" closedby="any" aria-labelledby="profileDialogTitle">
   <div class="dlg-wrap">
     <div class="dlg-hdr">
-      <h2 id="profileDialogTitle">👤 Öğrenci Profili & Senkronizasyon</h2>
+      <h2 id="profileDialogTitle">👤 Öğrenci Profili & GitHub Veritabanı</h2>
       <button type="button" class="dlg-close" onclick="closeProfileModal()" aria-label="Kapat">&times;</button>
     </div>
 
     <div class="dlg-tabs">
       <button type="button" class="tab-btn active" id="btnTabProf" onclick="switchTab('prof')">📋 Profilim</button>
-      <button type="button" class="tab-btn" id="btnTabSync" onclick="switchTab('sync')">📲 Telefona Aktar (QR)</button>
-      <button type="button" class="tab-btn" id="btnTabCloud" onclick="switchTab('cloud')">☁️ Bulut Hesabı</button>
+      <button type="button" class="tab-btn" id="btnTabDb" onclick="switchTab('db')">☁️ GitHub Veritabanı</button>
     </div>
 
     <!-- Tab 1: Profile -->
@@ -157,67 +153,60 @@ dialog::backdrop{overflow:hidden;overscroll-behavior:contain;background-color:rg
 
       <div class="prof-card" id="profCardPreview">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <b id="cardDispName">Öğrenci</b>
-          <span class="mu" id="cardDispNo">#</span>
+          <b id="cardDispName">Muhammed Efe Keskin</b>
+          <span class="mu" id="cardDispNo">#22296577</span>
         </div>
         <div class="mu" style="font-size:12px;margin:2px 0 6px" id="cardDispDept">SCÜ İnşaat Mühendisliği</div>
         <div style="font-size:12px;display:flex;justify-content:space-between" id="cardGanoRow">
           <span>Mevcut: <b id="cardCurGano">–</b></span>
-          <span>Hedef: <b id="cardTgtGano">–</b></span>
+          <span>Hedef: <b id="cardTgtGano">3.20</b></span>
         </div>
         <div class="prof-target-bar"><i id="cardTargetBar"></i></div>
-        <div class="mu" style="font-size:11px" id="cardTargetMsg">Hedef GANO belirleyerek motivasyonunu takip et.</div>
+        <div class="mu" style="font-size:11px" id="cardTargetMsg">Hedef GANO motivasyon takibi.</div>
       </div>
 
       <div class="dlg-actions">
         <button type="button" class="btn-primary" onclick="saveProfileForm()">Profili Kaydet</button>
-        <button type="button" class="btn-sec" onclick="switchTab('sync')">📲 Telefona Aktar</button>
+        <button type="button" class="btn-sec" onclick="switchTab('db')">☁️ GitHub Veritabanı Ayarları</button>
       </div>
     </div>
 
-    <!-- Tab 2: Sync / QR Code -->
-    <div id="tab-sync" class="tab-pane">
-      <div class="qr-box">
-        <p class="qr-desc">Telefonunun kamerasını aşağıdaki QR koda tut. Tüm notların ve profilin <b>anında telefonunda açılır ve kaydedilir</b>.</p>
-        <div class="qr-img">
-          <img id="qrImage" width="200" height="200" alt="Eşitleme QR Kodu">
+    <!-- Tab 2: GitHub Database -->
+    <div id="tab-db" class="tab-pane">
+      <div class="prof-card" style="margin-top:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b>📁 Veritabanı Dosyası</b>
+          <span class="ok">🟢 Aktif</span>
         </div>
-        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button type="button" class="btn-primary" onclick="copySyncUrl()">📋 Eşitleme Bağlantısını Kopyala</button>
+        <div class="mu" style="font-size:12px;word-break:break-all">
+          github.com/efekeskn/mezuniyetime-ne-kald- ➔ <code>data.json</code>
         </div>
+        <p class="mu" style="font-size:12px;margin:8px 0 0">
+          Hem telefonda hem bilgisayarda siteyi açtığınızda tüm veriler doğrudan GitHub deposundaki <b>data.json</b> dosyasından otomatik yüklenir.
+        </p>
       </div>
-      <div class="prof-card" style="margin-top:10px">
-        <b style="display:block;margin-bottom:4px">💡 Nasıl çalışır?</b>
-        <span class="mu">Kamera kodu okuduğunda telefonunda aynı sayfa açılır ve "Profil ve notlar eşitlendi" uyarısı verir. Bundan sonra telefonunda da kaldığın yerden devam edebilirsin.</span>
-      </div>
-    </div>
 
-    <!-- Tab 3: Cloud / Supabase -->
-    <div id="tab-cloud" class="tab-pane">
+      <div class="dlg-actions" style="margin-top:10px">
+        <button type="button" class="btn-sec" onclick="fetchFromGitHub(true)">🔄 GitHub'dan Şimdi Yenile</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0">
+
       <div class="form-grid">
-        <p class="sub" style="margin:0">Cihazlar arasında hiçbir şey taratmadan otomatik eşitlensin istersen ücretsiz Supabase bulut veritabanını bağlayabilirsin:</p>
         <label>
-          <span>Supabase Project URL</span>
-          <input type="text" id="sbUrl" placeholder="https://xyz.supabase.co">
+          <span>GitHub Personal Access Token (Yazma İzni İçin)</span>
+          <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
         </label>
-        <label>
-          <span>Supabase Anon Key</span>
-          <input type="password" id="sbKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-        </label>
-        <label>
-          <span>E-posta</span>
-          <input type="email" id="sbEmail" placeholder="ornek@ogrenci.scu.edu.tr">
-        </label>
-        <label>
-          <span>Şifre</span>
-          <input type="password" id="sbPass" placeholder="••••••••">
-        </label>
+        <span class="mu" style="font-size:11px">
+          Siteden yaptığınız değişiklikleri tek tıkla GitHub veritabanına kaydetmek için bir kez token girebilirsiniz (token sadece kendi tarayıcınızda saklanır).
+          <br><a href="https://github.com/settings/tokens/new?scopes=repo&description=Mezuniyetime-Ne-Kaldi" target="_blank" rel="noopener" style="color:var(--ac)">👉 Buradan 1 tıkla token oluşturabilirsiniz.</a>
+        </span>
       </div>
+
       <div class="dlg-actions">
-        <button type="button" class="btn-primary" onclick="handleSupabaseAuth('login')">Giriş Yap</button>
-        <button type="button" class="btn-sec" onclick="handleSupabaseAuth('signup')">Kayıt Ol</button>
+        <button type="button" class="btn-primary" onclick="saveToGitHub()">☁️ Değişiklikleri GitHub'a Kaydet</button>
       </div>
-      <div id="sbMsg" class="mu" style="font-size:12px;margin-top:8px"></div>
+      <div id="ghSaveMsg" style="font-size:12px;margin-top:6px"></div>
     </div>
   </div>
 </dialog>
@@ -250,36 +239,11 @@ const hr=a=>H.find(h=>a>=h[0]);
 let S;try{S=JSON.parse(localStorage.getItem("mz")||"null")}catch(e){}
 S=S||{m:{},v:{},f:{},w:{},s:{},h:{},W:40,profile:{}};
 S.h=S.h||{};
-S.profile=S.profile||{name:"",studentNo:"",department:"SCÜ İnşaat Mühendisliği",targetGano:""};
+S.profile=S.profile||{name:"Muhammed Efe Keskin",studentNo:"22296577",department:"SCÜ İnşaat Mühendisliği",targetGano:"3.20"};
 
 function save(){
   try{localStorage.setItem("mz",JSON.stringify(S))}catch(e){}
 }
-
-/* URL Sync Check on load */
-(function checkUrlSync(){
-  const hash=window.location.hash;
-  if(hash&&hash.startsWith("#sync=")){
-    try{
-      const b64=hash.slice(6);
-      const json=decodeURIComponent(escape(atob(b64)));
-      const data=JSON.parse(json);
-      if(data){
-        if(data.p) S.profile=Object.assign(S.profile||{},data.p);
-        if(data.m) S.m=data.m;
-        if(data.v) S.v=data.v;
-        if(data.f) S.f=data.f;
-        if(data.w) S.w=data.w;
-        if(data.s) S.s=data.s;
-        if(data.h) S.h=data.h;
-        if(data.W!==undefined) S.W=data.W;
-        save();
-        history.replaceState(null,"",window.location.pathname+window.location.search);
-        setTimeout(()=>showToast("✅ Profil ve tüm notlar başarıyla bu cihaza aktarıldı!"),400);
-      }
-    }catch(err){console.error("Sync decode error",err)}
-  }
-})();
 
 const C=[];let html="";
 D.forEach((sem,si)=>{
@@ -339,27 +303,20 @@ function calc(){
  updateProfileUI();
 }
 
-/* Profile & Sync UI Logic */
+/* Profile & UI */
 function updateProfileUI(){
   const p=S.profile||{};
-  const name=p.name&&p.name.trim()?p.name.trim():"";
+  const name=p.name&&p.name.trim()?p.name.trim():"Muhammed Efe Keskin";
   const hdrName=document.getElementById("hdrName");
   const hdrStatus=document.getElementById("hdrStatus");
   const hdrAvatar=document.getElementById("hdrAvatar");
 
-  if(name){
-    hdrName.textContent=name;
-    hdrStatus.textContent=(p.studentNo?`#${p.studentNo} · `:"")+"📱 Eşitle";
-    const parts=name.split(" ");
-    const initials=(parts[0][0]+(parts.length>1?parts[parts.length-1][0]:"")).toUpperCase();
-    hdrAvatar.textContent=initials;
-  }else{
-    hdrName.textContent="Profil Oluştur";
-    hdrStatus.textContent="📱 Telefona Aktar";
-    hdrAvatar.textContent="👤";
-  }
+  hdrName.textContent=name;
+  hdrStatus.textContent="🟢 GitHub Veritabanı";
+  const parts=name.split(" ");
+  const initials=(parts[0][0]+(parts.length>1?parts[parts.length-1][0]:"")).toUpperCase();
+  hdrAvatar.textContent=initials;
 
-  // Preview inside modal
   const cardDispName=document.getElementById("cardDispName");
   const cardDispNo=document.getElementById("cardDispNo");
   const cardDispDept=document.getElementById("cardDispDept");
@@ -369,7 +326,7 @@ function updateProfileUI(){
   const cardTargetMsg=document.getElementById("cardTargetMsg");
 
   if(cardDispName){
-    cardDispName.textContent=name||"Öğrenci";
+    cardDispName.textContent=name;
     cardDispNo.textContent=p.studentNo?`#${p.studentNo}`:"";
     cardDispDept.textContent=p.department||"SCÜ İnşaat Mühendisliği";
     cardCurGano.textContent=currentGano;
@@ -429,10 +386,13 @@ if(!('closedBy' in HTMLDialogElement.prototype)){
 
 function openProfileModal(tab){
   const p=S.profile||{};
-  document.getElementById("profName").value=p.name||"";
-  document.getElementById("profNo").value=p.studentNo||"";
+  document.getElementById("profName").value=p.name||"Muhammed Efe Keskin";
+  document.getElementById("profNo").value=p.studentNo||"22296577";
   document.getElementById("profDept").value=p.department||"SCÜ İnşaat Mühendisliği";
-  document.getElementById("profTargetGano").value=p.targetGano||"";
+  document.getElementById("profTargetGano").value=p.targetGano||"3.20";
+  const savedToken=localStorage.getItem("gh_token")||"";
+  const ghTokenInput=document.getElementById("ghToken");
+  if(ghTokenInput) ghTokenInput.value=savedToken;
   updateProfileUI();
 
   if(tab){
@@ -454,48 +414,9 @@ function switchTab(tabId){
   if(tabId==="prof"){
     document.getElementById("btnTabProf").classList.add("active");
     document.getElementById("tab-prof").classList.add("active");
-  }else if(tabId==="sync"){
-    document.getElementById("btnTabSync").classList.add("active");
-    document.getElementById("tab-sync").classList.add("active");
-    generateQrCode();
-  }else if(tabId==="cloud"){
-    document.getElementById("btnTabCloud").classList.add("active");
-    document.getElementById("tab-cloud").classList.add("active");
-  }
-}
-
-function getSyncUrl(){
-  const payload={
-    p: S.profile||{},
-    m: S.m||{},
-    v: S.v||{},
-    f: S.f||{},
-    w: S.w||{},
-    s: S.s||{},
-    h: S.h||{},
-    W: S.W||40
-  };
-  const json=JSON.stringify(payload);
-  const b64=btoa(unescape(encodeURIComponent(json)));
-  return `${window.location.origin}${window.location.pathname}#sync=${b64}`;
-}
-
-function generateQrCode(){
-  const url=getSyncUrl();
-  const qrImg=document.getElementById("qrImage");
-  qrImg.src=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}`;
-}
-
-function copySyncUrl(){
-  const url=getSyncUrl();
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(()=>{
-      showToast("📋 Eşitleme bağlantısı kopyalandı! Kendine WhatsApp veya mesajla gönderebilirsin.");
-    }).catch(()=>{
-      prompt("Eşitleme bağlantısını kopyala:",url);
-    });
-  }else{
-    prompt("Eşitleme bağlantısını kopyala:",url);
+  }else if(tabId==="db"){
+    document.getElementById("btnTabDb").classList.add("active");
+    document.getElementById("tab-db").classList.add("active");
   }
 }
 
@@ -506,66 +427,131 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove("show"),3500);
 }
 
-/* Supabase Cloud Sync Integration */
-let supabaseClient=null;
-function initSupabase(){
-  const url=document.getElementById("sbUrl").value.trim()||localStorage.getItem("sb_url");
-  const key=document.getElementById("sbKey").value.trim()||localStorage.getItem("sb_key");
-  if(url&&key&&window.supabase){
-    try{
-      supabaseClient=window.supabase.createClient(url,key);
-      localStorage.setItem("sb_url",url);
-      localStorage.setItem("sb_key",key);
-      return true;
-    }catch(e){console.error(e)}
-  }
-  return false;
-}
+/* GitHub Database (data.json) Sync Logic */
+let currentSha=null;
 
-async function handleSupabaseAuth(type){
-  const msgEl=document.getElementById("sbMsg");
-  msgEl.textContent="İşlem yapılıyor...";
-  if(!initSupabase()){
-    msgEl.textContent="⚠️ Lütfen geçerli bir Supabase URL ve Anon Key girin.";
-    return;
-  }
-  const email=document.getElementById("sbEmail").value.trim();
-  const password=document.getElementById("sbPass").value.trim();
-  if(!email||!password){
-    msgEl.textContent="⚠️ Lütfen e-posta ve şifre girin.";
-    return;
-  }
+async function fetchFromGitHub(showToastMsg=false){
   try{
-    let res;
-    if(type==="signup"){
-      res=await supabaseClient.auth.signUp({
-        email,
-        password,
-        options:{data:{profile:S.profile,grades:S}}
-      });
-      if(res.error) throw res.error;
-      msgEl.innerHTML=`<span class="ok">✅ Kayıt başarılı! Lütfen varsa e-posta onayını yapın.</span>`;
-    }else{
-      res=await supabaseClient.auth.signInWithPassword({email,password});
-      if(res.error) throw res.error;
-      const user=res.data.user;
-      if(user && user.user_metadata && user.user_metadata.grades){
-        S=Object.assign(S,user.user_metadata.grades);
-        save();
-        calc();
-        msgEl.innerHTML=`<span class="ok">✅ Giriş yapıldı ve buluttaki notlar yüklendi!</span>`;
-        showToast("☁️ Buluttaki notlarınız başarıyla yüklendi!");
-        setTimeout(closeProfileModal,1500);
-      }else{
-        // upload current
-        await supabaseClient.auth.updateUser({data:{profile:S.profile,grades:S}});
-        msgEl.innerHTML=`<span class="ok">✅ Giriş yapıldı ve mevcut notlar buluta yedeklendi!</span>`;
-      }
+    const rawUrl=`https://raw.githubusercontent.com/efekeskn/mezuniyetime-ne-kald-/main/data.json?t=${Date.now()}`;
+    const res=await fetch(rawUrl);
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    if(data){
+      applyLoadedData(data);
+      if(showToastMsg) showToast("✅ Veriler GitHub veritabanından yüklendi!");
     }
   }catch(err){
-    msgEl.innerHTML=`<span class="bad">Hata: ${err.message||err}</span>`;
+    console.warn("Raw fetch failed, trying local /data.json",err);
+    try{
+      const res2=await fetch(`data.json?t=${Date.now()}`);
+      if(res2.ok){
+        const data2=await res2.json();
+        applyLoadedData(data2);
+      }
+    }catch(e2){
+      console.warn("Local fetch failed",e2);
+    }
+  }
+
+  // Pre-fetch sha for writing
+  try{
+    const token=localStorage.getItem("gh_token")||"";
+    const headers=token?{"Authorization":`token ${token}`}:{};
+    const apiRes=await fetch("https://api.github.com/repos/efekeskn/mezuniyetime-ne-kald-/contents/data.json", {headers});
+    if(apiRes.ok){
+      const apiData=await apiRes.json();
+      currentSha=apiData.sha;
+    }
+  }catch(e){}
+}
+
+function applyLoadedData(data){
+  if(data.profile) S.profile=Object.assign(S.profile||{},data.profile);
+  if(data.m) S.m=data.m;
+  if(data.v) S.v=data.v;
+  if(data.f) S.f=data.f;
+  if(data.w) S.w=data.w;
+  if(data.s) S.s=data.s;
+  if(data.h) S.h=data.h;
+  if(data.W!==undefined) S.W=data.W;
+  save();
+  calc();
+  updateProfileUI();
+}
+
+async function saveToGitHub(){
+  let token=(document.getElementById("ghToken")?.value||localStorage.getItem("gh_token")||"").trim();
+  const msgEl=document.getElementById("ghSaveMsg");
+  
+  if(!token){
+    openProfileModal('db');
+    if(msgEl) msgEl.innerHTML=`<span class="bad">⚠️ Kaydetmek için lütfen GitHub Token (Personal Access Token) girin.</span>`;
+    return;
+  }
+
+  localStorage.setItem("gh_token",token);
+  if(msgEl) msgEl.textContent="GitHub veritabanına kaydediliyor...";
+
+  try{
+    // Always refresh SHA before commit
+    const getRes=await fetch("https://api.github.com/repos/efekeskn/mezuniyetime-ne-kald-/contents/data.json",{
+      headers:{"Authorization":`token ${token}`}
+    });
+    if(getRes.ok){
+      const d=await getRes.json();
+      currentSha=d.sha;
+    }
+
+    const payload={
+      profile:S.profile||{},
+      m:S.m||{},
+      v:S.v||{},
+      f:S.f||{},
+      w:S.w||{},
+      s:S.s||{},
+      h:S.h||{},
+      W:S.W||40,
+      updatedAt:new Date().toISOString()
+    };
+
+    const contentStr=JSON.stringify(payload,null,2);
+    const contentB64=btoa(unescape(encodeURIComponent(contentStr)));
+
+    const bodyData={
+      message:`notlar güncellendi (${new Date().toLocaleDateString("tr-TR")} ${new Date().toLocaleTimeString("tr-TR")})`,
+      content:contentB64
+    };
+    if(currentSha){
+      bodyData.sha=currentSha;
+    }
+
+    const putRes=await fetch("https://api.github.com/repos/efekeskn/mezuniyetime-ne-kald-/contents/data.json",{
+      method:"PUT",
+      headers:{
+        "Authorization":`token ${token}`,
+        "Content-Type":"application/json",
+        "Accept":"application/vnd.github.v3+json"
+      },
+      body:JSON.stringify(bodyData)
+    });
+
+    if(!putRes.ok){
+      const errJson=await putRes.json().catch(()=>({}));
+      throw new Error(errJson.message||("HTTP "+putRes.status));
+    }
+
+    const putResult=await putRes.json();
+    currentSha=putResult.content?.sha||null;
+    if(msgEl) msgEl.innerHTML=`<span class="ok">✅ Başarıyla GitHub veritabanına kaydedildi! Telefondan girdiğinizde güncel veriler gelecektir.</span>`;
+    showToast("☁️ Notlar GitHub veritabanına kaydedildi!");
+  }catch(err){
+    console.error("Save error:",err);
+    if(msgEl) msgEl.innerHTML=`<span class="bad">Hata: ${err.message}</span>`;
+    showToast("❌ Kaydetme hatası: "+err.message);
   }
 }
 
+// Automatically fetch from GitHub database on initial page load
+fetchFromGitHub(false);
 calc();
 </script></body></html>
